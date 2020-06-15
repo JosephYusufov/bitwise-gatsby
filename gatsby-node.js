@@ -34,35 +34,46 @@ exports.createPages = ({ actions, graphql }) => {
 
     */
     graphql(`
-        query data {
-            allFile(filter: {extension: {eq: "json"}}) {
-                edges {
-                    node {
-                        id
-                        name
-                        extension
-                    }
-                }    
+    {
+        allArticleMetadataJson {
+          nodes {
+            data {
+              title
+              description
+              path
+              image
+              featured
+              author {
+                facebook
+                description
+                instagram
+                name
+                profilePicture
+                youtube
+              }
             }
+          }
         }
+      }
     `).then(res => {
         const data = res.data;
-        data.allFile.edges.map((file, i) => {
-            console.log(file.node.name);
-            data[file.node.name] = file.node.extension
+        data.allArticlesMetaDataJson.nodes.map((articleMetaData, i) => {
+            // console.log(file.node.name);
+            article[articleMetaData.path] = articleMetaData;
         }); 
+    });
 
-        return graphql(`
-            query markdown {
-                allFile(filter: {extension: {eq: "md"}}) {
-                    edges{
-                        node {
-                            extension
-                        }
-                    }
-                }
-            }
-        `)
+        // return graphql(`
+        //     query markdown {
+        //         allFile(filter: {extension: {eq: "md"}}) {
+        //             edges{
+        //                 node {
+        //                     extension
+        //                 }
+        //             }
+        //         }
+        //     }
+        // `)
         // console.log(data.allFile.edges);
     }).then(res => {
         // data[]
