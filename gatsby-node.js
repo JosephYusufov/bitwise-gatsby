@@ -5,12 +5,36 @@
  */
 
 // You can delete this file if you're not using it
-import { graphql, useStaticQuery } from 'gatsby';
 
-exports.createPages = ({ actions }) => {
+exports.createPages = ({ actions, graphql }) => {
     const { createPage } = actions;
-    const { data } = useStaticQuery(graphql`
-        query files {
+    let articles = {};
+
+    /* queries all metadata
+      allArticleMetadataJson {
+    nodes {
+      data {
+        title
+        description
+        path
+        image
+        featured
+        author {
+          facebook
+          description
+          instagram
+          name
+          profilePicture
+          youtube
+        }
+      }
+    }
+  }
+}
+
+    */
+    graphql(`
+        query data {
             allFile(filter: {extension: {eq: "json"}}) {
                 edges {
                     node {
@@ -21,6 +45,27 @@ exports.createPages = ({ actions }) => {
                 }    
             }
         }
-    `);
-    console.log(data);
+    `).then(res => {
+        const data = res.data;
+        data.allFile.edges.map((file, i) => {
+            console.log(file.node.name);
+            data[file.node.name] = file.node.extension
+        }); 
+
+        return graphql(`
+            query markdown {
+                allFile(filter: {extension: {eq: "md"}}) {
+                    edges{
+                        node {
+                            extension
+                        }
+                    }
+                }
+            }
+        `)
+        // console.log(data.allFile.edges);
+    }).then(res => {
+        // data[]
+        console.log(res);
+    })
 };
